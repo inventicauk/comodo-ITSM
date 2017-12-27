@@ -1,18 +1,18 @@
-# COMODO Remote Control
-## CHOCO INSTALL comodo-remote
+# COMODO ITSM Agent Chocolatey Nuget Package
+## CHOCO INSTALL comodo-itsm
 
-Chocolatey Package for the COMODO One ITSM/RMM software to Remote Control a Remote Desktop based on Chromemoting
-Package directly download the Remote Control Software from the Comodo servers located at
+Chocolatey Package for the COMODO One ITSM/RMM Agent Communication Software
+This will need the agent to be activated to the HOST and TOKEN of your Comodo account.
 
 ## Version 6.14.9539.17120 / December 23rd 2017
-https://dl.cmdm.comodo.com/download/ComodoRemoteControl.exe
-SHA256 Checksum: 0bfbccf44c609ce85b3b1b77115503101fbab8152ffe5a3789f73fb3047b8522
+http://dl.cmdm.comodo.com/download/COCC.msi
+SHA256 Checksum: 
 
 ### Checksum Verification using the AU Powershell Module 
 https://www.powershellgallery.com/packages/AU/2017.8.30
 https://github.com/majkinetor/au/
 
 Import-Module AU
-Get-RemoteChecksum -Algorithm sha256 -Url 'https://dl.cmdm.comodo.com/download/ComodoRemoteControl.exe'
-0bfbccf44c609ce85b3b1b77115503101fbab8152ffe5a3789f73fb3047b8522
+Get-RemoteChecksum -Algorithm sha256 -Url 'http://dl.cmdm.comodo.com/download/COCC.msi'
+b35cad69840578a783c41e79e3a65d7db19ef7f0e50d66de8f95a6a885e91504
 

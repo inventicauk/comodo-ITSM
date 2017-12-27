@@ -15,26 +15,26 @@ $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 #$fileLocation = '\\SHARE_LOCATION\to\INSTALLER_FILE'
 # Community Repo: Use official urls for non-redist binaries or redist where total package size is over 200MB
 # Internal/Organization: Download from internal location (internet sources are unreliable)
-$url        = '' # download url, HTTPS preferred
-$url64      = '' # 64bit URL here (HTTPS preferred) or remove - if installer contains both (very rare), use $url
+$url        = 'http://dl.cmdm.comodo.com/download/COCC.msi' # download url, HTTPS preferred
+$url64      = 'http://dl.cmdm.comodo.com/download/COCC.msi' # 64bit URL here (HTTPS preferred) or remove - if installer contains both (very rare), use $url
 
 $packageArgs = @{
   packageName   = $env:ChocolateyPackageName
   unzipLocation = $toolsDir
-  fileType      = 'EXE_MSI_OR_MSU' #only one of these: exe, msi, msu
+  fileType      = 'MSI' #only one of these: exe, msi, msu
   url           = $url
   url64bit      = $url64
   #file         = $fileLocation
 
-  softwareName  = 'comodo-ITSM*' #part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
+  softwareName  = 'Comodo ITSM*' #part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
 
   # Checksums are now required as of 0.10.0.
   # To determine checksums, you can get that from the original site if provided. 
   # You can also use checksum.exe (choco install checksum) and use it 
   # e.g. checksum -t sha256 -f path\to\file
-  checksum      = ''
+  checksum      = 'b35cad69840578a783c41e79e3a65d7db19ef7f0e50d66de8f95a6a885e91504' # Get-RemoteChecksum -algorithm sha256 -url 'http://dl.cmdm.comodo.com/download/COCC.msi'
   checksumType  = 'sha256' #default is md5, can also be sha1, sha256 or sha512
-  checksum64    = ''
+  checksum64    = 'b35cad69840578a783c41e79e3a65d7db19ef7f0e50d66de8f95a6a885e91504'
   checksumType64= 'sha256' #default is checksumType
 
   # MSI
@@ -61,6 +61,38 @@ Install-ChocolateyPackage @packageArgs # https://chocolatey.org/docs/helpers-ins
 ## If you are making your own internal packages (organizations), you can embed the installer or 
 ## put on internal file share and use the following instead (you'll need to add $file to the above)
 #Install-ChocolateyInstallPackage @packageArgs # https://chocolatey.org/docs/helpers-install-chocolatey-install-package
+$pp = Get-PackageParameters
+if ($pp['token'] -and $pp['host']){
+  $token = "55776ef2c85b6ca713c1ea0377b99e00"
+  $domain = "inventica-msp"
+  $COMODOpath = Join-Path -ChildPath "COMODO\COMODO ITSM" -Path ${env:ProgramFiles(x86)}
+  if (Test-Path -Path $COMODOpath -eq $false){
+      $COMODOpath = Join-Path -ChildPath "COMODO\COMODO ITSM" -Path ${env:ProgramFiles}
+  }
+  $inipath = Join-Path -ChildPath "enrollment_config.ini" -Path $COMODOpath
+  $ini = """
+  [General]
+  token = $($token)
+  host = $($domain).cmdm.comodo.com
+  port = 443
+  suite = 4
+  remove_third_party = false
+  """
+  Out-File -FilePath $inipath -Encoding utf8 -InputObject $ini
+  & . "C:\Program Files (x86)\COMODO\Comodo ITSM\ITSMService.exe -c 2"
+} else {
+  if ($pp['ini']){
+    if (Test-Path -Path $pp['ini']){
+      $inipath = $pp['ini']
+    } else {
+      $inipath = Join-Path -ChildPath ".\enrollment_config.ini" -Path $toolsDir
+    }    
+    if (Test-Path -Path $inipath) {
+      Copy-Item -Path $inipath -Destination "C:\Program Files (x86)\COMODO\Comodo ITSM\"
+      & . "C:\Program Files (x86)\COMODO\Comodo ITSM\ITSMService.exe -c 2"
+    }  
+  }
+}
 
 ## Main helper functions - these have error handling tucked into them already
 ## see https://chocolatey.org/docs/helpers-reference
