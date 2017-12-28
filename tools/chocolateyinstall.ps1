@@ -62,6 +62,7 @@ Install-ChocolateyPackage @packageArgs # https://chocolatey.org/docs/helpers-ins
 ## put on internal file share and use the following instead (you'll need to add $file to the above)
 #Install-ChocolateyInstallPackage @packageArgs # https://chocolatey.org/docs/helpers-install-chocolatey-install-package
 $pp = Get-PackageParameters
+Write-Host "Package Parameters for Device Enrollment: $($pp)"
 if ($pp['token'] -and $pp['host']){
   $token = "55776ef2c85b6ca713c1ea0377b99e00"
   $domain = "inventica-msp"
